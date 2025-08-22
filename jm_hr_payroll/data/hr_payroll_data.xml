@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hr_rule_basic_salary" model="hr.salary.rule">
+            <field name="name">Basic Salary</field>
+            <field name="sequence" eval="1"/>
+            <field name="code">BASIC</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_basic"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage</field>
+        </record>
+
+        <record id="hr_rule_gross_salary" model="hr.salary.rule">
+            <field name="name">Gross</field>
+            <field name="sequence" eval="100"/>
+            <field name="code">GROSS</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_gross"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.salary_rule_category_basic + categories.salary_rule_category_allowance</field>
+        </record>
+
+        <record id="hr_rule_house_rent_allowance" model="hr.salary.rule">
+            <field name="name">House Rent Allowance</field>
+            <field name="sequence" eval="3"/>
+            <field name="code">HRA</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.hra</field>
+            <field name="amount_percentage">30</field>
+        </record>
+
+        <record id="hr_rule_dearness_allowance" model="hr.salary.rule">
+            <field name="name">Dearness Allowance</field>
+            <field name="sequence" eval="5"/>
+            <field name="code">DA</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.da</field>
+        </record>
+
+        <record id="hr_rule_travel_allowance" model="hr.salary.rule">
+            <field name="name">Travel Allowance</field>
+            <field name="sequence" eval="7"/>
+            <field name="code">Travel</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.travel_allowance</field>
+        </record>
+
+        <record id="hr_rule_meal_allowance" model="hr.salary.rule">
+            <field name="name">Meal Allowance</field>
+            <field name="sequence" eval="9"/>
+            <field name="code">Meal</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.meal_allowance</field>
+        </record>
+
+        <record id="hr_rule_medical_allowance" model="hr.salary.rule">
+            <field name="name">Medical Allowance</field>
+            <field name="sequence" eval="11"/>
+            <field name="code">Medical</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.medical_allowance</field>
+        </record>
+
+        <record id="hr_rule_net_salary" model="hr.salary.rule">
+            <field name="name">Net Salary</field>
+            <field name="sequence" eval="200"/>
+            <field name="code">NET</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_net"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.salary_rule_category_basic + categories.salary_rule_category_allowance + categories.salary_rule_category_deduction</field>
+            <field name="register_id" ref="contrib_register_employees"/>
+        </record>
+
+        <!-- Salary Structure -->
+        <record id="payroll_structure_base" model="hr.payroll.structure">
+            <field name="code">BASE</field>
+            <field name="name">Base for new structures</field>
+            <field eval="[(6, 0, [ref('hr_rule_basic_salary'), ref('hr_rule_gross_salary'),ref('hr_rule_net_salary')])]" name="rule_ids"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Decimal Precision -->
+        <record forcecreate="True" id="hr_decimal_payroll" model="decimal.precision">
+            <field name="name">Payroll</field>
+            <field name="digits">2</field>
+        </record>
+
+        <record forcecreate="True" id="hr_decimal_payroll_rate" model="decimal.precision">
+            <field name="name">Payroll Rate</field>
+            <field name="digits">4</field>
+        </record>
+    </data>
+</odoo>
