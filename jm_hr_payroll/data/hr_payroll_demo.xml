@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Contribution Register -->
+        <record id="hr_register_house_rent_allowance" model="hr.contribution.register">
+            <field name="name">House Rent Allowance Register</field>
+        </record>
+
+        <record id="hr_register_provident_fund" model="hr.contribution.register">
+            <field name="name">Provident Fund Register</field>
+        </record>
+
+        <record id="hr_register_professional_tax" model="hr.contribution.register">
+            <field name="name">Professional Tax Register</field>
+        </record>
+
+        <record id="hr_register_meal_voucher" model="hr.contribution.register">
+            <field name="name">Meal Voucher Register</field>
+        </record>
+
+        <!-- Salary Rules -->
+        <record id="hr_rule_house_rent_allowance" model="hr.salary.rule">
+            <field name="amount_select">percentage</field>
+            <field eval="40.0" name="amount_percentage"/>
+            <field name="amount_percentage_base">contract.wage</field>
+            <field name="code">HRA</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="register_id" ref="hr_register_house_rent_allowance"/>
+            <field name="name">House Rent Allowance</field>
+            <field name="sequence" eval="5"/>
+        </record>
+
+        <record id="hr_rule_conveyance_allowance" model="hr.salary.rule">
+            <field name="amount_select">fix</field>
+            <field eval="2000.0" name="amount_fix"/>
+            <field name="code">CA</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="name">Conveyance Allowance</field>
+            <field name="sequence" eval="10"/>
+        </record>
+
+        <record id="hr_rule_professional_tax" model="hr.salary.rule">
+            <field name="amount_select">fix</field>
+            <field eval="150" name="sequence"/>
+            <field eval="-350.0" name="amount_fix"/>
+            <field name="code">PT</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_deduction"/>
+            <field name="register_id" ref="hr_register_professional_tax"/>
+            <field name="name">Professional Tax</field>
+        </record>
+
+        <record id="hr_rule_provident_fund" model="hr.salary.rule">
+            <field name="amount_select">percentage</field>
+            <field eval="120" name="sequence"/>
+            <field eval="-12.5" name="amount_percentage"/>
+            <field name="amount_percentage_base">contract.wage</field>
+            <field name="code">PF</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_deduction"/>
+            <field name="register_id" ref="hr_register_provident_fund"/>
+            <field name="name">Provident Fund</field>
+        </record>
+
+        <record id="hr_rule_conveyance_allowance_gravie" model="hr.salary.rule">
+            <field name="amount_select">fix</field>
+            <field eval="800.0" name="amount_fix"/>
+            <field name="code">CAGG</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="name">Conveyance Allowance For Gravie</field>
+            <field name="sequence" eval="15"/>
+        </record>
+
+        <record id="hr_rule_meal_voucher" model="hr.salary.rule">
+            <field name="amount_select">fix</field>
+            <field eval="15" name="amount_fix"/>
+            <field name="quantity">worked_days.WORK100 and worked_days.WORK100.number_of_days</field>
+            <field name="code">MA</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="register_id" ref="hr_register_meal_voucher"/>
+            <field name="name">Meal Voucher</field>
+            <field name="sequence" eval="16"/>
+         </record>
+
+        <record id="hr_rule_sales_commission" model="hr.salary.rule">
+            <field name="amount_select">code</field>
+            <field name="code">SALE</field>
+            <field name="category_id" ref="jm_hr_payroll.salary_rule_category_allowance"/>
+            <field name="name">Get 1% of sales</field>
+            <field name="sequence" eval="17"/>
+            <field name="amount_python_compute">result = ((inputs.SALEURO and inputs.SALEURO.amount) + (inputs.SALASIA and inputs.SALASIA.amount)) * 0.01</field>
+         </record>
+
+        <!-- Rule Inputs -->
+        <record id="hr_input_sales_europe" model="hr.rule.input">
+            <field name="code">SALEURO</field>
+            <field name="name">Sales to Europe</field>
+            <field name="input_id" ref="hr_rule_sales_commission"/>
+        </record>
+
+        <record id="hr_input_sales_asia" model="hr.rule.input">
+            <field name="code">SALASIA</field>
+            <field name="name">Sales to Asia</field>
+            <field name="input_id" ref="hr_rule_sales_commission"/>
+        </record>
+
+        <!-- Salary Structure -->
+         <record id="payroll_structure_marketing_executive" model="hr.payroll.structure">
+            <field name="code">ME</field>
+            <field name="name">Marketing Executive</field>
+            <field eval="[(6, 0, [ref('hr_rule_house_rent_allowance'), ref('hr_rule_conveyance_allowance'),ref('hr_rule_professional_tax'),ref('hr_rule_provident_fund')])]" name="rule_ids"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="parent_id" ref="payroll_structure_base"/>
+        </record>
+
+        <record id="payroll_structure_marketing_executive_gravie" model="hr.payroll.structure">
+            <field name="code">MEGG</field>
+            <field name="name">Marketing Executive for Gilles Gravie</field>
+            <field eval="[(6, 0, [ref('hr_rule_conveyance_allowance_gravie'), ref('hr_rule_meal_voucher')])]" name="rule_ids"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="parent_id" ref="payroll_structure_marketing_executive"/>
+        </record>
+
+        <!-- Employee -->
+        <record id="hr_employee_roger_scott" model="hr.employee">
+            <field eval="0" name="manager"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field eval="1" name="active"/>
+            <field name="name">Roger Scott</field>
+            <field name="work_location">Building 1, Second Floor</field>
+            <field name="work_phone">+3282823500</field>
+            <field name="image" type="base64" file="jm_hr_payroll/static/img/hr_employee_payroll-image.jpg"/>
+        </record>
+
+        <!-- Employee Contract -->
+        <record id="hr_contract_marketing_executive_roger_scott" model="hr.contract">
+            <field name="name">Marketing Executive Contract</field>
+            <field name="type_id" ref="hr_contract.contract_type_employee"/>
+            <field name="date_start" eval="time.strftime('%Y-%m')+'-1'"/>
+            <field name="date_end" eval="time.strftime('%Y')+'-12-31'"/>
+            <field name="struct_id" ref="jm_hr_payroll.payroll_structure_marketing_executive"/>
+            <field name="employee_id" ref="hr_employee_roger_scott"/>
+            <field name="notes">Default contract for marketing executives</field>
+            <field eval="4000.0" name="wage"/>
+        </record>
+
+        <record id="hr_contract_marketing_executive_gravie" model="hr.contract">
+            <field name="name">Contract For Gilles Gravie</field>
+            <field name="type_id" ref="hr_contract.contract_type_employee"/>
+            <field name="date_start" eval="time.strftime('%Y-%m')+'-1'"/>
+            <field name="date_end" eval="time.strftime('%Y')+'-12-31'"/>
+            <field name="struct_id" ref="jm_hr_payroll.payroll_structure_marketing_executive_gravie"/>
+            <field name="employee_id" ref="hr.employee_qdp"/>
+            <field name="notes">This is Gilles Gravie's contract</field>
+            <field eval="5000.0" name="wage"/>
+        </record>
+
+</odoo>
